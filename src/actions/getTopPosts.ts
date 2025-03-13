@@ -1,6 +1,7 @@
 import { Action } from 'solana-agent-kit';
 import { z } from 'zod';
-import { withStagehand } from '../utils';
+import { postsSchema } from '../types/types';
+import { formatPostsUrl, withStagehand } from '../utils';
 
 export const getTopPosts: Action = {
   name: 'GET_TOP_POSTS',
@@ -12,7 +13,8 @@ export const getTopPosts: Action = {
     'retrieve top posts',
     'top forum posts',
   ],
-  description: 'Get the top posts from the Solana forum by activity (views and replies)',
+  description:
+    'Get the top posts from the Solana forum by activity (views and replies)',
   examples: [
     [
       {
@@ -51,35 +53,17 @@ export const getTopPosts: Action = {
   handler: async () =>
     await withStagehand(async (page) => {
       await page.goto('https://forum.solana.com/top');
-      const { topPosts } = await page.extract({
-        instruction: 'Get the top 10 posts by activity (views and replies)',
-        schema: z.object({
-          topPosts: z.array(
-            z.object({
-              title: z.string().describe('The title of the post'),
-              category: z.string().describe('The category of the post'),
-              age: z.string().describe('The age of the post'),
-              replies: z.number().describe('The number of replies on the post'),
-              views: z
-                .number()
-                .describe('The number of views the post has received'),
-              activity: z
-                .string()
-                .describe('The last activity time of the post'),
-              author: z.string().describe('The author username of the post'),
-              postUrl: z.string().describe('The URL of the post'),
-            }),
-          ),
-        }),
+
+      const { posts } = await page.extract({
+        instruction:
+          'Get the top 10 posts by activity (views and replies), order by activity descending',
+        schema: postsSchema,
       });
-      topPosts.forEach((post) => {
-        if (post.postUrl.startsWith('/')) {
-          post.postUrl = `https://forum.solana.com${post.postUrl}`;
-        }
-      });
+      formatPostsUrl(posts);
+
       return {
         status: 'success',
-        posts: topPosts,
+        posts,
       };
     }),
 };

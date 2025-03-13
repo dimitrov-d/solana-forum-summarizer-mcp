@@ -1,6 +1,7 @@
 import { Action } from 'solana-agent-kit';
 import { z } from 'zod';
-import { withStagehand } from '../utils';
+import { postsSchema } from '../types/types';
+import { formatPostsUrl, withStagehand } from '../utils';
 
 export const getLatestPosts: Action = {
   name: 'GET_LATEST_POSTS',
@@ -49,35 +50,16 @@ export const getLatestPosts: Action = {
   handler: async () =>
     await withStagehand(async (page) => {
       await page.goto('https://forum.solana.com/latest');
-      const { latestPosts } = await page.extract({
-        instruction: 'Get the top 10 latest posts',
-        schema: z.object({
-          latestPosts: z.array(
-            z.object({
-              title: z.string().describe('The title of the post'),
-              category: z.string().describe('The category of the post'),
-              age: z.string().describe('The age of the post'),
-              replies: z.number().describe('The number of replies on the post'),
-              views: z
-                .number()
-                .describe('The number of views the post has received'),
-              activity: z
-                .string()
-                .describe('The last activity time of the post'),
-              author: z.string().describe('The author username of the post'),
-              postUrl: z.string().describe('The URL of the post'),
-            }),
-          ),
-        }),
+
+      const { posts } = await page.extract({
+        instruction: 'Get the top 10 latest posts, order by age descending',
+        schema: postsSchema,
       });
-      latestPosts.forEach((post) => {
-        if (post.postUrl.startsWith('/')) {
-          post.postUrl = `https://forum.solana.com${post.postUrl}`;
-        }
-      });
+      formatPostsUrl(posts);
+
       return {
         status: 'success',
-        posts: latestPosts,
+        posts,
       };
     }),
 };

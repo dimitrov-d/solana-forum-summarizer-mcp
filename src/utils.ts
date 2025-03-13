@@ -1,10 +1,15 @@
 import { ObserveResult, Page, Stagehand } from '@browserbasehq/stagehand';
 import boxen from 'boxen';
 import chalk from 'chalk';
-import fs from 'fs/promises';
 import { z } from 'zod';
 import { StagehandConfig } from './stagehand.config';
+import { ForumPost } from './types/types';
 
+/**
+ * Announce a message with an optional title using a styled box.
+ * @param message - The message to display.
+ * @param title - Optional title for the message box.
+ */
 export function announce(message: string, title?: string) {
   console.log(
     boxen(message, {
@@ -43,6 +48,11 @@ export function validateZodSchema(schema: z.ZodTypeAny, data: unknown) {
   }
 }
 
+/**
+ * Draw an overlay on the page for observed elements.
+ * @param page - The page to draw overlays on.
+ * @param results - The results from the observe function containing selectors.
+ */
 export async function drawObserveOverlay(page: Page, results: ObserveResult[]) {
   // Convert single xpath to array for consistent handling
   const xpathList = results.map((result) => result.selector);
@@ -84,6 +94,10 @@ export async function drawObserveOverlay(page: Page, results: ObserveResult[]) {
   }, validXpaths);
 }
 
+/**
+ * Clear overlays from the page.
+ * @param page - The page to clear overlays from.
+ */
 export async function clearOverlays(page: Page) {
   // remove existing stagehandObserve attributes
   await page.evaluate(() => {
@@ -100,6 +114,11 @@ export async function clearOverlays(page: Page) {
 
 const instructionCache: Record<string, ObserveResult> = {};
 
+/**
+ * Cache an action for a given instruction.
+ * @param instruction - The instruction to cache.
+ * @param actionToCache - The action to cache.
+ */
 export function simpleCache(instruction: string, actionToCache: any) {
   try {
     instructionCache[instruction] = actionToCache;
@@ -143,6 +162,11 @@ export async function actWithCache(
   await page.act(actionToCache);
 }
 
+/**
+ * Execute an action with Stagehand.
+ * @param action - The action to execute with Stagehand.
+ * @returns The result of the action.
+ */
 export async function withStagehand(action: (page: Page) => Promise<any>) {
   const stagehand = new Stagehand({ ...StagehandConfig });
 
@@ -158,4 +182,16 @@ export async function withStagehand(action: (page: Page) => Promise<any>) {
       console.error(error);
       return { success: false, error: message };
     });
+}
+
+/**
+ * Format the post URLs to be absolute.
+ * @param posts - The list of forum posts to format URLs for.
+ */
+export function formatPostsUrl(posts: ForumPost[]) {
+  posts.forEach((post) => {
+    if (post.postUrl.startsWith('/')) {
+      post.postUrl = `https://forum.solana.com${post.postUrl}`;
+    }
+  });
 }
