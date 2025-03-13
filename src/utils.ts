@@ -97,40 +97,16 @@ export async function clearOverlays(page: Page) {
   });
 }
 
-export async function simpleCache(
+const instructionCache: Record<string, ObserveResult> = {};
+
+export function simpleCache(
   instruction: string,
-  actionToCache: ObserveResult
+  actionToCache: any
 ) {
-  // Save action to cache.json
   try {
-    // Read existing cache if it exists
-    let cache: Record<string, ObserveResult> = {};
-    try {
-      const existingCache = await fs.readFile("cache.json", "utf-8");
-      cache = JSON.parse(existingCache);
-    } catch (error) {
-      // File doesn't exist yet, use empty cache
-    }
-
-    // Add new action to cache
-    cache[instruction] = actionToCache;
-
-    // Write updated cache to file
-    await fs.writeFile("cache.json", JSON.stringify(cache, null, 2));
+    instructionCache[instruction] = actionToCache;
   } catch (error) {
     console.error(chalk.red("Failed to save to cache:"), error);
-  }
-}
-
-export async function readCache(
-  instruction: string
-): Promise<ObserveResult | null> {
-  try {
-    const existingCache = await fs.readFile("cache.json", "utf-8");
-    const cache: Record<string, ObserveResult> = JSON.parse(existingCache);
-    return cache[instruction] || null;
-  } catch (error) {
-    return null;
   }
 }
 
@@ -145,10 +121,9 @@ export async function actWithCache(
   page: Page,
   instruction: string
 ): Promise<void> {
-  // Try to get action from cache first
-  const cachedAction = await readCache(instruction);
+  const cachedAction = instructionCache[instruction];
   if (cachedAction) {
-    console.log(chalk.blue("Using cached action for:"), instruction);
+    console.log(chalk.blue("Using cached action for: "), instruction);
     await page.act(cachedAction);
     return;
   }
@@ -160,7 +135,7 @@ export async function actWithCache(
   // Cache the playwright action
   const actionToCache = results[0];
   console.log(chalk.blue("Taking cacheable action:"), actionToCache);
-  await simpleCache(instruction, actionToCache);
+  simpleCache(instruction, actionToCache);
   // OPTIONAL: Draw an overlay over the relevant xpaths
   await drawObserveOverlay(page, results);
   await page.waitForTimeout(1000); // Can delete this line, just a pause to see the overlay

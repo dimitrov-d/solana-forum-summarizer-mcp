@@ -1,7 +1,7 @@
 {
-  "name": "solana-forum-scraper-mcp",
+  "name": "solana-forum-summarizer-mcp",
   "version": "1.0.0",
-  "description": "Solana Forum Scraper MCP Server",
+  "description": "Solana Forum Summarizer MCP Server",
   "main": "index.ts",
   "scripts": {
     "start": "tsx src/index.ts"
