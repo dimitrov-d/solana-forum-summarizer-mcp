@@ -6,6 +6,15 @@
   "scripts": {
     "start": "tsx src/index.ts"
   },
+  "dependencies": {
+    "@browserbasehq/sdk": "2.3.0",
+    "@browserbasehq/stagehand": "1.14.0",
+    "@playwright/test": "^1.51.0",
+    "boxen": "^8.0.1",
+    "chalk": "^5.4.1",
+    "dotenv": "^16.4.7",
+    "zod": "^3.24.2"
+  },
   "devDependencies": {
     "@types/node": "^22.13.10",
     "dotenv": "^16.4.7",
