@@ -3,7 +3,7 @@ import boxen from 'boxen';
 import chalk from 'chalk';
 import fs from 'fs/promises';
 import { z } from 'zod';
-import StagehandConfig from './stagehand.config';
+import { StagehandConfig } from './stagehand.config';
 
 export function announce(message: string, title?: string) {
   console.log(

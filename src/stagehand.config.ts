@@ -1,13 +1,11 @@
-import type { ConstructorParams, LogLine } from '@browserbasehq/stagehand';
-import dotenv from 'dotenv';
+import type { ConstructorParams } from '@browserbasehq/stagehand';
+import 'dotenv/config';
 
-dotenv.config();
-
-const StagehandConfig: ConstructorParams = {
+export const StagehandConfig: ConstructorParams = {
   env: 'LOCAL',
-  debugDom: undefined, // Enable DOM debugging features
-  headless: false, // Run browser in headless mode
-  logger: (message: LogLine) => {}, // Do not log anything
+  debugDom: false, // To enable DOM debugging features
+  headless: false, // To run browser in headless mode
+  logger: () => {}, // Do not log anything
   domSettleTimeoutMs: 30_000,
   modelName: 'claude-3-5-sonnet-latest',
   modelClientOptions: {

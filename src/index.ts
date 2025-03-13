@@ -1,22 +1,25 @@
 // #!/usr/bin/env node
 import { clusterApiUrl, Keypair } from '@solana/web3.js';
 import 'dotenv/config';
-import { SolanaAgentKit, startMcpServer } from 'solana-agent-kit';
+import { Action, SolanaAgentKit, startMcpServer } from 'solana-agent-kit';
+import { getLatestPosts } from './actions/getLatestPosts';
+import bs58 from 'bs58';
 
 async function main() {
   const agent = new SolanaAgentKit(
-    Keypair.generate().secretKey.toString(),
+    bs58.encode(Keypair.generate().secretKey),
     clusterApiUrl('mainnet-beta'),
     {},
   );
 
   const mcp_actions = {
-  };
+    GET_LATEST_POSTS: getLatestPosts,
+  } as Record<string, Action>;
 
   try {
     // Start the MCP server with error handling
     await startMcpServer(mcp_actions, agent, {
-      name: 'solana-agent',
+      name: 'solana-forum-summarizer',
       version: '0.0.1',
     });
   } catch (error) {
