@@ -4,6 +4,8 @@ import 'dotenv/config';
 import { Action, SolanaAgentKit, startMcpServer } from 'solana-agent-kit';
 import { getLatestPosts } from './actions/getLatestPosts';
 import bs58 from 'bs58';
+import { getTopPosts } from './actions/getTopPosts';
+import { getPostsByCategory } from './actions/getPostsByCategory';
 
 async function main() {
   const agent = new SolanaAgentKit(
@@ -14,6 +16,8 @@ async function main() {
 
   const mcp_actions = {
     GET_LATEST_POSTS: getLatestPosts,
+    GET_TOP_POSTS: getTopPosts,
+    GET_POSTS_BY_CATEGORY: getPostsByCategory,
   } as Record<string, Action>;
 
   try {
