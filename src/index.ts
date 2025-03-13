@@ -1,15 +1,41 @@
-import { Stagehand } from '@browserbasehq/stagehand';
-import { main } from './main.js';
-import StagehandConfig from './stagehand.config.js';
+// #!/usr/bin/env node
+import { clusterApiUrl, Keypair } from '@solana/web3.js';
+import 'dotenv/config';
+import { SolanaAgentKit, startMcpServer } from 'solana-agent-kit';
 
-const stagehand = new Stagehand({
-  ...StagehandConfig,
+async function main() {
+  const agent = new SolanaAgentKit(
+    Keypair.generate().secretKey.toString(),
+    clusterApiUrl('mainnet-beta'),
+    {},
+  );
+
+  const mcp_actions = {
+  };
+
+  try {
+    // Start the MCP server with error handling
+    await startMcpServer(mcp_actions, agent, {
+      name: 'solana-agent',
+      version: '0.0.1',
+    });
+  } catch (error) {
+    console.error(
+      'Failed to start MCP server:',
+      error instanceof Error ? error.message : String(error),
+    );
+    process.exit(1);
+  }
+}
+
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:', error);
+  process.exit(1);
 });
 
-stagehand
-  .init()
-  .then(() =>
-    main({ page: stagehand.page, context: stagehand.context, stagehand }),
-  )
-  .then(() => stagehand.close())
-  .catch((error) => console.error(`Error occurred in main function: ${error}`));
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  process.exit(1);
+});
+
+main();
