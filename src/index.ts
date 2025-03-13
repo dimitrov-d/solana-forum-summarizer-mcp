@@ -1,11 +1,13 @@
 // #!/usr/bin/env node
 import { clusterApiUrl, Keypair } from '@solana/web3.js';
+import bs58 from 'bs58';
 import 'dotenv/config';
 import { Action, SolanaAgentKit, startMcpServer } from 'solana-agent-kit';
 import { getLatestPosts } from './actions/getLatestPosts';
-import bs58 from 'bs58';
-import { getTopPosts } from './actions/getTopPosts';
 import { getPostsByCategory } from './actions/getPostsByCategory';
+import { getTopPosts } from './actions/getTopPosts';
+import { searchPosts } from './actions/searchPosts';
+import { summarizePost } from './actions/summarizePost';
 
 async function main() {
   const agent = new SolanaAgentKit(
@@ -18,6 +20,8 @@ async function main() {
     GET_LATEST_POSTS: getLatestPosts,
     GET_TOP_POSTS: getTopPosts,
     GET_POSTS_BY_CATEGORY: getPostsByCategory,
+    SEARCH_POSTS: searchPosts,
+    SUMMARIZE_POST: summarizePost,
   } as Record<string, Action>;
 
   try {
