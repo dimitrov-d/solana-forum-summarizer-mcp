@@ -4,7 +4,7 @@
       "command": "tsx",
       "args": ["/full/path/to/index.ts"],
       "env": {
-        "ANTHROPIC_API_KEY": "your_anthropic_api_key"
+        "ANTHROPIC_API_KEY": "<ANTHROPIC_API_KEY>"
       }
     }
   }
