@@ -42,12 +42,11 @@ export const getPostsByCategory: Action = {
         category: string;
       };
       if (category === 'Governance') category = 'gov';
-
-      const categoryUrl = `https://forum.solana.com/c/${category.toLowerCase()}`;
+      const categoryUrl = `https://forum.solana.com/c/${category.toLowerCase()}?ascending=false&order=activity`;
       await page.goto(categoryUrl);
 
       const { posts } = await page.extract({
-        instruction: `Get the top 10 posts from this page with ${category} category posts, order by age descending`,
+        instruction: `Get the top 10 posts from this page with ${category} category posts, order by activity descending`,
         schema: postsSchema,
       });
       formatPostsUrl(posts);
